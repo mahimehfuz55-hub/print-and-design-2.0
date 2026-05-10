@@ -1,802 +1,311 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrintN Design - Premium Print & Branding Studio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+● <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Next.js Middleware &amp; Validation Schemas</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-50: #f0f9ff;
-            --primary-100: #e0f2fe;
-            --primary-200: #bae6fd;
-            --primary-300: #7dd3fc;
-            --primary-400: #38bdf8;
-            --primary-500: #0ea5e9;
-            --primary-600: #0284c7;
-            --primary-700: #0369a1;
-            --primary-800: #075985;
-            --primary-900: #0c4a6e;
-            --primary-950: #082f49;
-            
-            --accent: #F59E0B;
-            --accent-hover: #D97706;
-            --accent-active: #B45309;
-            
-            --gold: #D4AF37;
-            --gold-light: #F3E5AB;
-            --gold-dark: #AA8C2C;
-            
-            --neutral: #0F172A;
-            --neutral-light: #F8FAFC;
-            --neutral-muted: #94A3B8;
-            --neutral-subtle: #E2E8F0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--neutral-light);
-            color: var(--neutral);
-            line-height: 1.6;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'DM Serif Display', serif;
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-        }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        header {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        header nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--neutral);
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 40px;
-        }
-
-        nav a {
-            color: var(--neutral);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--accent);
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--neutral);
-            border: 2px solid var(--neutral);
-        }
-
-        .btn-secondary:hover {
-            background: var(--neutral);
-            color: white;
-        }
-
-        section {
-            padding: 120px 0;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, var(--primary-950) 0%, var(--neutral) 100%);
-            color: white;
-            padding: 160px 0;
-        }
-
-        .hero h1 {
-            font-size: 56px;
-            margin-bottom: 24px;
-            color: white;
-        }
-
-        .hero p {
-            font-size: 18px;
-            margin-bottom: 40px;
-            max-width: 600px;
-            line-height: 1.8;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-top: 60px;
-        }
-
-        .service-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 32px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
-            border-color: var(--accent);
-        }
-
-        .service-card h3 {
-            font-size: 24px;
-            margin-bottom: 16px;
-            color: var(--neutral);
-        }
-
-        .service-card p {
-            color: var(--neutral-muted);
-            margin-bottom: 24px;
-        }
-
-        .service-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .quote-form {
-            background: white;
-            border-radius: 16px;
-            padding: 48px;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--neutral);
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        footer {
-            background: var(--neutral);
-            color: white;
-            padding: 60px 0 24px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-section h4 {
-            margin-bottom: 16px;
-            color: var(--gold);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section a {
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s;
-        }
-
-        .footer-section a:hover {
-            color: var(--gold);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 24px;
-            text-align: center;
-            font-size: 14px;
-            color: #cbd5e1;
-        }
-
-        .whatsapp-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: #25D366;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.3s;
-            z-index: 50;
-            text-decoration: none;
-        }
-
-        .whatsapp-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-        }
-
-        .whatsapp-btn span {
-            font-size: 28px;
-        }
-
-        .section-title {
-            font-size: 48px;
-            margin-bottom: 60px;
-            text-align: center;
-            color: var(--neutral);
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .feature-list {
-            list-style: none;
-        }
-
-        .feature-list li {
-            padding: 16px 0;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            gap: 16px;
-        }
-
-        .feature-list li:before {
-            content: "✓";
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        @media (max-width: 768px) {
-            nav ul {
-                display: none;
-            }
-
-            .hero h1 {
-                font-size: 36px;
-            }
-
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .quote-form {
-                padding: 32px 24px;
-            }
-
-            section {
-                padding: 80px 0;
-            }
-
-            .section-title {
-                font-size: 36px;
-            }
-        }
-
-        .step-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
-            font-weight: 600;
-        }
-
-        .step.active .step-number {
-            background: var(--accent);
-        }
-
-        .step.completed .step-number {
-            background: #10b981;
-        }
-
-        .step p {
-            font-size: 12px;
-            color: var(--neutral-muted);
-        }
-
-        .testimonials {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-top: 60px;
-        }
-
-        .testimonial {
-            background: white;
-            padding: 32px;
-            border-radius: 16px;
-            border-left: 4px solid var(--accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .testimonial p {
-            margin-bottom: 16px;
-            color: var(--neutral);
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            font-weight: 600;
-            color: var(--neutral);
-            font-size: 14px;
-        }
-
-        .stars {
-            color: var(--accent);
-            margin-bottom: 12px;
-        }
-
-        .cta-section {
-            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 100%);
-            color: white;
-            text-align: center;
-            padding: 80px 24px;
-            border-radius: 16px;
-        }
-
-        .cta-section h2 {
-            font-size: 42px;
-            margin-bottom: 24px;
-            color: white;
-        }
-
-        .cta-section p {
-            font-size: 18px;
-            margin-bottom: 32px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            margin-top: 40px;
-        }
-
-        .gallery-item {
-            aspect-ratio: 1;
-            background: #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+      /* ── Reset & Base ─────────────────────────────────── */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg:        #0d1117;
+        --surface:   #161b22;
+        --border:    #30363d;
+        --text:      #c9d1d9;
+        --heading:   #f0f6fc;
+        --accent:    #58a6ff;
+        --green:     #3fb950;
+        --orange:    #d29922;
+        --pink:      #f778ba;
+        --purple:    #bc8cff;
+        --cyan:      #39c5cf;
+        --red:       #ff7b72;
+        --comment:   #8b949e;
+        --string:    #a5d6ff;
+        --keyword:   #ff7b72;
+        --func:      #d2a8ff;
+        --number:    #79c0ff;
+        --tag:       #7ee787;
+        --radius:    12px;
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+        padding: 2rem 1rem;
+      }
+
+      /* ── Layout ───────────────────────────────────────── */
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      /* ── Header ───────────────────────────────────────── */
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      header h1 {
+        font-size: 2.4rem;
+        color: var(--heading);
+        margin-bottom: .4rem;
+        background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      header p {
+        color: var(--comment);
+        font-size: 1.05rem;
+      }
+
+      /* ── Nav Pills ────────────────────────────────────── */
+      .nav-pills {
+        display: flex;
+        justify-content: center;
+        gap: .5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2.5rem;
+      }
+
+      .nav-pills a {
+        text-decoration: none;
+        padding: .45rem 1rem;
+        border-radius: 999px;
+        font-size: .85rem;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        color: var(--text);
+        transition: all .2s;
+      }
+
+      .nav-pills a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: rgba(88,166,255,.08);
+      }
+
+      /* ── Section Card ─────────────────────────────────── */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        transition: border-color .25s;
+      }
+
+      .card:hover { border-color: var(--accent); }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255,255,255,.02);
+      }
+
+      .card-header .icon {
+        font-size: 1.25rem;
+      }
+
+      .card-header h2 {
+        font-size: 1.15rem;
+        color: var(--heading);
+        font-weight: 700;
+      }
+
+      .card-header .badge {
+        margin-left: auto;
+        font-size: .7rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+      }
+
+      .badge-middleware  { background: rgba(88,166,255,.15); color: var(--accent); }
+      .badge-validation { background: rgba(63,185,80,.15);  color: var(--green);  }
+      .badge-rate       { background: rgba(247,120,186,.15); color: var(--pink); }
+
+      .card-body {
+        padding: 0;
+      }
+
+      /* ── Code Block ───────────────────────────────────── */
+      pre {
+        margin: 0;
+        padding: 1.2rem 1.4rem;
+        overflow-x: auto;
+        font-size: .85rem;
+        line-height: 1.65;
+        font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+        tab-size: 2;
+      }
+
+      code { font-family: inherit; }
+
+      /* ── Syntax Tokens ────────────────────────────────── */
+      .kw   { color: var(--keyword); }   /* keywords            */
+      .fn   { color: var(--func); }      /* function names      */
+      .str  { color: var(--string); }    /* strings             */
+      .num  { color: var(--number); }    /* numbers             */
+      .cmt  { color: var(--comment); font-style: italic; }      /* comments          */
+      .tag  { color: var(--tag); }       /* imports, tags       */
+      .pnt  { color: var(--orange); }    /* punctuation         */
+      .opr  { color: var(--cyan); }      /* operators           */
+      .prp  { color: var(--accent); }    /* property names      */
+
+      /* ── Feature Grid ─────────────────────────────────── */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .feature {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.2rem;
+        text-align: center;
+        transition: transform .2s, border-color .2s;
+      }
+
+      .feature:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+      }
+
+      .feature .emoji { font-size: 1.8rem; margin-bottom: .5rem; }
+      .feature h3     { color: var(--heading); font-size: .95rem; margin-bottom: .3rem; }
+      .feature p      { color: var(--comment); font-size: .82rem; }
+
+      /* ── Footer ───────────────────────────────────────── */
+      footer {
+        text-align: center;
+        color: var(--comment);
+        font-size: .8rem;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Responsive ───────────────────────────────────── */
+      @media (max-width: 600px) {
+        header h1 { font-size: 1.6rem; }
+        pre { font-size: .78rem; padding: 1rem; }
+      }
     </style>
-</head>
-<body>
-    <!-- Header -->
+  </head>
+  <body>
+
+  <div class="container">
+
+    <!-- ════════════ HEADER ════════════ -->
     <header>
-        <div class="container">
-            <nav>
-                <div class="logo">PrintN Design</div>
-                <ul>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#process">Process</a></li>
-                    <li><a href="#quote">Quote</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-                <button class="btn btn-primary">Get Started</button>
-            </nav>
-        </div>
+      <h1>Next.js Middleware &amp; Zod Schemas</h1>
+      <p>Role-based route protection, rate limiting, and data validation — all in one view.</p>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Premium Print & Branding Studio</h1>
-            <p>From concept to production. We create tactile brand experiences through signage, stickers, packaging, and large-format campaigns that leave lasting impressions.</p>
-            <div style="display: flex; gap: 16px;">
-                <button class="btn btn-primary">Start Your Quote</button>
-                <button class="btn btn-secondary">View Portfolio</button>
-            </div>
-        </div>
+    <!-- ════════════ NAV PILLS ════════════ -->
+    <nav class="nav-pills">
+      <a href="#middleware">Middleware</a>
+      <a href="#login">Login Schema</a>
+      <a href="#signup">Signup Schema</a>
+      <a href="#rate-limit">Rate Limiter</a>
+    </nav>
+
+    <!-- ════════════ FEATURES ════════════ -->
+    <section class="features">
+      <div class="feature">
+        <div class="emoji">🔐</div>
+        <h3>Role-Based Access</h3>
+        <p>Admin routes protected by JWT role claims.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">📝</div>
+        <h3>Zod Validation</h3>
+        <p>Strongly-typed login &amp; signup schemas.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">⏱️</div>
+        <h3>Rate Limiting</h3>
+        <p>In-memory sliding window per IP address.</p>
+      </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="services">
-        <div class="container">
-            <h2 class="section-title">Our Services</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">🏢</div>
-                    <h3>Signage</h3>
-                    <p>Dimensional letters, acrylic panels, storefront fascia, and wayfinding systems that make your brand impossible to miss.</p>
-                    <a href="#" class="btn btn-secondary">Learn More</a>
-                </div>
+    <!-- ════════════ MIDLEWARE CARD ════════════ -->
+    <section class="card" id="middleware">
+      <div class="card-header">
+        <span class="icon">🛡️</span>
+        <h2>src/middleware.ts</h2>
+        <span class="badge badge-middleware">Middleware</span>
+      </div>
+      <div class="card-body">
+        <pre><code><span class="kw">import</span> { NextResponse } <span class="kw">from</span> <span class="str">'next/server'</span>
+  <span class="kw">import</span> { jwtVerify }  <span class="kw">from</span> <span class="str">'@node-rs/argon2'</span>
 
-                <div class="service-card">
-                    <div class="service-icon">🏷️</div>
-                    <h3>Stickers & Labels</h3>
-                    <p>Custom die-cut stickers, vinyl decals, and label systems for packaging, campaigns, and retail applications.</p>
-                    <a href="#" class="btn btn-secondary">Learn More</a>
-                </div>
+  <span class="kw">const</span> <span class="prp">ADMIN_ROUTES</span> <span class="opr">=</span> [ <span class="str">'/admin'</span>, <span class="str">'/dashboard'</span> ]
 
-                <div class="service-card">
-                    <div class="service-icon">🎨</div>
-                    <h3>Branding Kits</h3>
-                    <p>Complete brand systems including business cards, stationery, packaging, and collateral materials.</p>
-                    <a href="#" class="btn btn-secondary">Learn More</a>
-                </div>
+  <span class="kw">export async function</span> <span class="fn">middleware</span><span class="pnt">(</span>request<span class="pnt">)</span> <span class="pnt">{</span>
+    <span class="kw">const</span> { url }     <span class="opr">=</span> request
+    <span class="kw">const</span> { pathname } <span class="opr">=</span> <span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span>url<span class="pnt">).</span><span class="prp">pathname</span>
 
-                <div class="service-card">
-                    <div class="service-icon">📦</div>
-                    <h3>Packaging</h3>
-                    <p>Custom packaging design and production for e-commerce, retail, and premium product launches.</p>
-                    <a href="#" class="btn btn-secondary">Learn More</a>
-                </div>
+    <span class="cmt">// ── Public routes bypass auth check ──</span>
+    <span class="kw">if</span> <span class="pnt">(</span><span class="prp">pathname</span> <span class="opr">===</span> <span class="str">'/login'</span> <span class="opr">||</span> <span class="prp">pathname</span> <span class="opr">===</span> <span
+  class="str">'/signup'</span><span class="pnt">)</span> <span class="pnt">{</span>
+      <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">next</span><span class="pnt">()</span>
+    <span class="pnt">}</span>
 
-                <div class="service-card">
-                    <div class="service-icon">🚗</div>
-                    <h3>Vehicle Wraps</h3>
-                    <p>Full and partial vehicle wraps that turn your fleet into mobile billboards.</p>
-                    <a href="#" class="btn btn-secondary">Learn More</a>
-                </div>
+    <span class="cmt">// ── Extract &amp; verify JWT ──</span>
+    <span class="kw">const</span> token <span class="opr">=</span> request.<span class="prp">cookies</span>.<span class="fn">get</span><span class="pnt">(</span><span class="str">'token'</span><span class="pnt">)?.</span><span class="prp">value</span>
+    <span class="kw">if</span> <span class="pnt">(!</span>token<span class="pnt">)</span> <span class="pnt">{</span>
+      <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">redirect</span><span class="pnt">(</span><span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span><span class="str">'/login'</span>, url<span class="pnt">))</span>
+    <span class="pnt">}</span>
 
-                <div class="service-card">
-                    <div class="service-icon">📐</div>
-                    <h3>Large Format</h3>
-                    <p>Banners, billboards, trade show displays, and oversized print materials for maximum impact.</p>
-                    <a href="#" class="btn btn-secondary">Learn More</a>
-                </div>
-            </div>
-        </div>
+    <span class="kw">let</span> payload
+    <span class="kw">try</span> <span class="pnt">{</span>
+      payload <span class="opr">=</span> <span class="kw">await</span> <span class="fn">jwtVerify</span><span class="pnt">(</span>token, <span class="prp">process</span>.<span class="prp">env</span>.<span class="prp">JWT_SECRET</span><span class="pnt">)</span>
+    <span class="pnt">}</span> <span class="kw">catch</span> <span class="pnt">{</span>
+      <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">redirect</span><span class="pnt">(</span><span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span><span class="str">'/login'</span>, url<span class="pnt">))</span>
+    <span class="pnt">}</span>
+
+    <span class="cmt">// ── Admin route guard ──</span>
+    <span class="kw">if</span> <span class="pnt">(</span><span class="prp">ADMIN_ROUTES</span>.<span class="fn">some</span><span class="pnt">(</span>r <span class="opr">=&gt;</span> <span class="prp">pathname</span>.<span class="fn">startsWith</span><span
+  class="pnt">(</span>r<span class="pnt">))</span> <span class="pnt">)</span> <span class="pnt">{</span>
+      <span class="kw">if</span> <span class="pnt">(</span>payload.<span class="prp">role</span> <span class="opr">!==</span> <span class="str">'admin'</span><span class="pnt">)</span> <span class="pnt">{</span>
+        <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">redirect</span><span class="pnt">(</span><span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span><span class="str">'/'</span>, url<span class="pnt">))</span>
+      <span class="pnt">}</span>
+    <span class="pnt">}</span>
+
+    <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">next</span><span class="pnt">()</span>
+  <span class="pnt">}</span>
+
+  <span class="kw">export const</span> config <span class="opr">=</span> <span class="pnt">{</span>
+    matcher<span class="pnt">:</span> <span class="str">'/((?!api|_next/static|_next/image|favicon.ico).*)'</span>
+  <span class="pnt">}</span></code></pre>
+      </div>
     </section>
 
-    <!-- Process Section -->
-    <section id="process">
-        <div class="container">
-            <h2 class="section-title">Our Process</h2>
-            <div class="two-column">
-                <div>
-                    <h3 style="font-size: 32px; margin-bottom: 32px;">From Brief to Delivery</h3>
-                    <ul class="feature-list">
-                        <li><strong>Consultation</strong> - Understand your vision and requirements</li>
-                        <li><strong>Design & Proof</strong> - Create mockups and get your approval</li>
-                        <li><strong>Material Selection</strong> - Choose the perfect substrate and finish</li>
-                        <li><strong>Production</strong> - Expert printing and finishing</li>
-                        <li><strong>Quality Check</strong> - Rigorous QC before shipment</li>
-                        <li><strong>Delivery</strong> - Timely delivery to your location</li>
-                    </ul>
-                </div>
-                <div>
-                    <div style="background: linear-gradient(135deg, var(--primary-200) 0%, var(--primary-100) 100%); border-radius: 16px; padding: 60px; text-align: center; color: var(--primary-700);">
-                        <div style="font-size: 64px; font-weight: bold; margin-bottom: 16px;">6</div>
-                        <p style="font-size: 18px;">Steps to Perfect Print</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Quote Section -->
-    <section id="quote">
-        <div class="container">
-            <h2 class="section-title">Get Your Quote</h2>
-            <form class="quote-form" onsubmit="handleSubmit(event)">
-                <div class="step-indicator">
-                    <div class="step completed">
-                        <div class="step-number">1</div>
-                        <p>Service</p>
-                    </div>
-                    <div class="step completed">
-                        <div class="step-number">2</div>
-                        <p>Details</p>
-                    </div>
-                    <div class="step active">
-                        <div class="step-number">3</div>
-                        <p>Contact</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <p>Confirm</p>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" name="name" required placeholder="Your name">
-                    </div>
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" name="email" required placeholder="your@email.com">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Phone *</label>
-                        <input type="tel" name="phone" required placeholder="+1 (555) 000-0000">
-                    </div>
-                    <div class="form-group">
-                        <label>Company</label>
-                        <input type="text" name="company" placeholder="Your company">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Service Type *</label>
-                    <select name="service" required>
-                        <option value="">Select a service</option>
-                        <option value="signage">Signage</option>
-                        <option value="stickers">Stickers & Labels</option>
-                        <option value="branding">Branding Kit</option>
-                        <option value="packaging">Packaging</option>
-                        <option value="vehicle-wraps">Vehicle Wraps</option>
-                        <option value="large-format">Large Format</option>
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Quantity *</label>
-                        <input type="number" name="quantity" required placeholder="Number of units">
-                    </div>
-                    <div class="form-group">
-                        <label>Budget Range</label>
-                        <select name="budget">
-                            <option value="">Select budget</option>
-                            <option value="under-1000">Under 1,000 AED</option>
-                            <option value="1000-5000">1,000 - 5,000 AED</option>
-                            <option value="5000-10000">5,000 - 10,000 AED</option>
-                            <option value="10000-50000">10,000 - 50,000 AED</option>
-                            <option value="50000+">50,000+ AED</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Project Notes</label>
-                    <textarea name="notes" placeholder="Tell us about your project..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 400;">
-                        <input type="checkbox" name="terms" required>
-                        I agree to the terms and conditions
-                    </label>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Quote Request</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section>
-        <div class="container">
-            <h2 class="section-title">What Clients Say</h2>
-            <div class="testimonials">
-                <div class="testimonial">
-                    <div class="stars">★★★★★</div>
-                    <p>"PrintN Design transformed our brand vision into stunning physical products. The quality and attention to detail is unmatched."</p>
-                    <div class="testimonial-author">- Sarah Johnson, Creative Director</div>
-                </div>
-
-                <div class="testimonial">
-                    <div class="stars">★★★★★</div>
-                    <p>"Fast turnaround, excellent communication, and products that exceeded our expectations. Highly recommended!"</p>
-                    <div class="testimonial-author">- Ahmed Al-Mansouri, Business Owner</div>
-                </div>
-
-                <div class="testimonial">
-                    <div class="stars">★★★★★</div>
-                    <p>"The team understood our requirements perfectly and delivered beyond what we imagined. True professionals."</p>
-                    <div class="testimonial-author">- Lisa Chen, Marketing Manager</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section>
-        <div class="container">
-            <div class="cta-section">
-                <h2>Ready to Bring Your Vision to Life?</h2>
-                <p>Get started with a free consultation and quote. Our team is ready to help you create something extraordinary.</p>
-                <button class="btn btn-primary" onclick="document.getElementById('quote').scrollIntoView({behavior: 'smooth'})">Get Your Quote Today</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>PrintN Design</h4>
-                    <p>Premium print and branding studio creating exceptional visual experiences.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="#services">Signage</a></li>
-                        <li><a href="#services">Stickers & Labels</a></li>
-                        <li><a href="#services">Branding Kits</a></li>
-                        <li><a href="#services">Packaging</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="#process">Our Process</a></li>
-                        <li><a href="#quote">Get Quote</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <p>📞 +971 50 000 0000</p>
-                    <p>📧 hello@printndesign.ae</p>
-                    <p>📍 Dubai, UAE</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 PrintN Design. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- WhatsApp Button -->
-    <a href="https://wa.me/971500000000" class="whatsapp-btn" target="_blank">
-        <span>💬</span>
-    </a>
-
-    <script>
-        function handleSubmit(event) {
-            event.preventDefault();
-            alert('Thank you for your quote request! We will contact you within 24 hours.');
-            event.target.reset();
-        }
-
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+    <!-- ════════════ LOGIN SCHEMA ════════════ -->
+    <section class="card" id="login">
+      <div class="card-header">
+        <span class="icon">🔑</span>
+        <h2>src/schemas/login.ts</h2>
+        <span class="badge badge-validation">Zod</span>
+      </div>
+      <div class="card-body">
+        <pre><code><span class="kw">import</span> { z } <span class="
