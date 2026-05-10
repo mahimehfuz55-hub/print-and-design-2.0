@@ -1,311 +1,423 @@
-<!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Next.js Middleware &amp; Validation Schemas</title>
-    <style>
-      /* ── Reset & Base ─────────────────────────────────── */
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  {
+    "name": "print-house-app",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start"
+    },
+    "dependencies": {
+      "next": "^14.2.5",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1",
+      "zod": "^3.23.8"
+    },
+    "devDependencies": {
+      "@types/node": "^20.14.0",
+      "@types/react": "^18.3.3",
+      "@types/react-dom": "^18.3.0",
+      "typescript": "^5.5.0"
+    }
+  }
 
-      :root {
-        --bg:        #0d1117;
-        --surface:   #161b22;
-        --border:    #30363d;
-        --text:      #c9d1d9;
-        --heading:   #f0f6fc;
-        --accent:    #58a6ff;
-        --green:     #3fb950;
-        --orange:    #d29922;
-        --pink:      #f778ba;
-        --purple:    #bc8cff;
-        --cyan:      #39c5cf;
-        --red:       #ff7b72;
-        --comment:   #8b949e;
-        --string:    #a5d6ff;
-        --keyword:   #ff7b72;
-        --func:      #d2a8ff;
-        --number:    #79c0ff;
-        --tag:       #7ee787;
-        --radius:    12px;
+  tsconfig.json
+
+  {
+    "compilerOptions": {
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "noEmit": true,
+      "esModuleInterop": true,
+      "module": "esnext",
+      "moduleResolution": "bundler",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "jsx": "preserve",
+      "incremental": true,
+      "plugins": [{ "name": "next" }],
+      "paths": { "@/*": ["./src/*"] }
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules"]
+  }
+
+  next.config.js
+
+  /** @type {import('next').NextConfig} */
+  const nextConfig = {};
+  module.exports = nextConfig;
+
+  src/middleware.ts
+
+  import { NextRequest, NextResponse } from 'next/server';
+
+  const RATE_LIMIT_WINDOW = 60_000; // 1 minute
+  const RATE_LIMIT_MAX = 30;
+
+  const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+  function getRateLimitKey(request: NextRequest): string {
+    return request.ip ?? request.headers.get('x-forwarded-for') ?? 'unknown';
+  }
+
+  function isRateLimited(key: string): boolean {
+    const now = Date.now();
+    const record = rateLimitMap.get(key);
+
+    if (!record || now > record.resetTime) {
+      rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+      return false;
+    }
+
+    if (record.count >= RATE_LIMIT_MAX) {
+      return true;
+    }
+
+    record.count += 1;
+    return false;
+  }
+
+  const securityHeaders = {
+    'X-DNS-Prefetch-Control': 'preconnect',
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'X-XSS-Protection': '1; mode=block',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'Content-Security-Policy':
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.google-analytics.com;",
+  };
+
+  export function middleware(request: NextRequest) {
+    const response = NextResponse.next();
+
+    if (request.nextUrl.pathname.startsWith('/api/')) {
+      const rateLimitKey = getRateLimitKey(request);
+
+      if (isRateLimited(rateLimitKey)) {
+        return new NextResponse('Too Many Requests', { status: 429 });
       }
 
-      html { scroll-behavior: smooth; }
-
-      body {
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.7;
-        padding: 2rem 1rem;
+      if (request.method === 'POST') {
+        const contentType = request.headers.get('content-type');
+        if (!contentType?.includes('application/json')) {
+          return new NextResponse('Invalid Content-Type', { status: 415 });
+        }
       }
+    }
 
-      /* ── Layout ───────────────────────────────────────── */
-      .container {
-        max-width: 960px;
-        margin: 0 auto;
+    Object.entries(securityHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
+  }
+
+  export const config = {
+    matcher: ['/api/:path*', '/((?!_next/static|_next/image|favicon.ico).*)'],
+  };
+
+  src/lib/validation/schemas.ts
+
+  import { z } from 'zod';
+
+  export const contactFormSchema = z.object({
+    name: z
+      .string()
+      .min(2, 'Name must be at least 2 characters')
+      .max(100, 'Name must be less than 100 characters')
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Name can only contain letters, spaces, hyphens, and apostrophes"
+      )
+      .transform((val) => val.trim()),
+
+    email: z
+      .string()
+      .email('Please enter a valid email address')
+      .max(255, 'Email must be less than 255 characters'),
+
+    phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number').optional(),
+
+    company: z
+      .string()
+      .max(100, 'Company name must be less than 100 characters')
+      .transform((val) => val.trim())
+      .optional(),
+
+    message: z
+      .string()
+      .min(10, 'Message must be at least 10 characters')
+      .max(5000, 'Message must be less than 5000 characters')
+      .transform((val) => val.trim()),
+  }).refine((data) => data.email || data.phone, {
+    message: 'Please provide at least one contact method (email or phone)',
+    path: ['email'],
+  });
+
+  export const quoteRequestSchema = z.object({
+    step1: z.object({
+      serviceType: z.enum(
+        ['signage', 'stickers', 'branding', 'packaging', 'vehicle-wraps', 'large-format'],
+        { required_error: 'Please select a service type' }
+      ),
+      projectType: z.enum(['personal', 'business', 'corporate', 'event'], {
+        required_error: 'Please select a project type',
+      }),
+    }),
+
+    step2: z.object({
+      dimensions: z.object({
+        width: z.number().positive('Width must be positive').max(100, 'Maximum width is 100m'),
+        height: z.number().positive('Height must be positive').max(100, 'Maximum height is 100m'),
+        unit: z.enum(['cm', 'm', 'ft']),
+      }),
+      quantity: z
+        .number()
+        .int()
+        .positive('Quantity must be at least 1')
+        .max(10000, 'Maximum quantity is 10,000'),
+      material: z.string().min(1, 'Please select a material').max(200, 'Material name too long'),
+      colors: z.string().min(1, 'Please specify color requirements').max(500, 'Color description too long'),
+    }),
+
+    step3: z.object({
+      fileUpload: z.any().optional(),
+      customDesign: z.boolean().optional(),
+      brandGuidelines: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+      specialInstructions: z.string().max(2000, 'Instructions are too long').optional(),
+    }),
+
+    step4: z.object({
+      preferredDate: z.string().min(1, 'Please select a delivery date'),
+      installationNeeded: z.boolean().optional(),
+      budgetRange: z.enum(
+        ['0-500', '500-1000', '1000-5000', '5000-10000', '10000+'],
+        { required_error: 'Please select a budget range' }
+      ),
+      priority: z.enum(['low', 'medium', 'high', 'urgent'], {
+        required_error: 'Please select a priority level',
+      }),
+    }),
+
+    step5: z.object({
+      name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
+      email: z.string().email('Please enter a valid email address'),
+      phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'),
+      company: z.string().max(100, 'Company name too long').optional(),
+      termsAccepted: z.literal(true, {
+        errorMap: () => ({ message: 'You must accept the terms and conditions' }),
+      }),
+    }),
+  });
+
+  export const rateLimitSchema = z.object({
+    ip: z.string().ip('Invalid IP address'),
+    path: z.string().url('Invalid URL path'),
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
+    timestamp: z.number().positive('Timestamp must be positive'),
+  });
+
+  src/app/api/contact/route.ts
+
+  import { NextRequest, NextResponse } from 'next/server';
+  import { contactFormSchema } from '@/lib/validation/schemas';
+
+  export async function POST(request: NextRequest) {
+    try {
+      const body = await request.json();
+      const validated = contactFormSchema.parse(body);
+
+      return NextResponse.json(
+        { success: true, message: 'Message received successfully', data: validated },
+        { status: 201 }
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        return NextResponse.json({ success: false, message: error.message }, { status: 400 });
       }
+      return NextResponse.json(
+        { success: false, message: 'Internal server error' },
+        { status: 500 }
+      );
+    }
+  }
 
-      /* ── Header ───────────────────────────────────────── */
-      header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid var(--border);
+  src/app/api/quote/route.ts
+
+  import { NextRequest, NextResponse } from 'next/server';
+  import { quoteRequestSchema } from '@/lib/validation/schemas';
+
+  export async function POST(request: NextRequest) {
+    try {
+      const body = await request.json();
+      const validated = quoteRequestSchema.parse(body);
+
+      return NextResponse.json(
+        { success: true, message: 'Quote request received successfully', data: validated },
+        { status: 201 }
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        return NextResponse.json({ success: false, message: error.message }, { status: 400 });
       }
+      return NextResponse.json(
+        { success: false, message: 'Internal server error' },
+        { status: 500 }
+      );
+    }
+  }
 
-      header h1 {
-        font-size: 2.4rem;
-        color: var(--heading);
-        margin-bottom: .4rem;
-        background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
+  src/app/globals.css
 
-      header p {
-        color: var(--comment);
-        font-size: 1.05rem;
-      }
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
 
-      /* ── Nav Pills ────────────────────────────────────── */
-      .nav-pills {
-        display: flex;
-        justify-content: center;
-        gap: .5rem;
-        flex-wrap: wrap;
-        margin-bottom: 2.5rem;
-      }
+  :root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #e94560;
+    --accent-hover: #c73a52;
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --text: #e0e0e0;
+    --text-muted: #a0a0b0;
+    --success: #2ecc71;
+    --error: #e74c3c;
+    --border: #2a2a4a;
+    --radius: 12px;
+  }
 
-      .nav-pills a {
-        text-decoration: none;
-        padding: .45rem 1rem;
-        border-radius: 999px;
-        font-size: .85rem;
-        font-weight: 600;
-        border: 1px solid var(--border);
-        color: var(--text);
-        transition: all .2s;
-      }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-      .nav-pills a:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-        background: rgba(88,166,255,.08);
-      }
+  html {
+    scroll-behavior: smooth;
+  }
 
-      /* ── Section Card ─────────────────────────────────── */
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        margin-bottom: 2rem;
-        overflow: hidden;
-        transition: border-color .25s;
-      }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
 
-      .card:hover { border-color: var(--accent); }
+  /* ── Layout ──────────────────────────── */
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-      .card-header {
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-        padding: 1rem 1.4rem;
-        border-bottom: 1px solid var(--border);
-        background: rgba(255,255,255,.02);
-      }
+  main {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    width: 100%;
+  }
 
-      .card-header .icon {
-        font-size: 1.25rem;
-      }
+  /* ── Header ──────────────────────────── */
+  .header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
 
-      .card-header h2 {
-        font-size: 1.15rem;
-        color: var(--heading);
-        font-weight: 700;
-      }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 
-      .card-header .badge {
-        margin-left: auto;
-        font-size: .7rem;
-        padding: .2rem .6rem;
-        border-radius: 999px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-      }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
 
-      .badge-middleware  { background: rgba(88,166,255,.15); color: var(--accent); }
-      .badge-validation { background: rgba(63,185,80,.15);  color: var(--green);  }
-      .badge-rate       { background: rgba(247,120,186,.15); color: var(--pink); }
+  .logo span {
+    color: var(--text);
+  }
 
-      .card-body {
-        padding: 0;
-      }
+  .nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
 
-      /* ── Code Block ───────────────────────────────────── */
-      pre {
-        margin: 0;
-        padding: 1.2rem 1.4rem;
-        overflow-x: auto;
-        font-size: .85rem;
-        line-height: 1.65;
-        font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-        tab-size: 2;
-      }
+  .nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
 
-      code { font-family: inherit; }
+  .nav a:hover {
+    color: var(--text);
+    background: rgba(233, 69, 96, 0.1);
+  }
 
-      /* ── Syntax Tokens ────────────────────────────────── */
-      .kw   { color: var(--keyword); }   /* keywords            */
-      .fn   { color: var(--func); }      /* function names      */
-      .str  { color: var(--string); }    /* strings             */
-      .num  { color: var(--number); }    /* numbers             */
-      .cmt  { color: var(--comment); font-style: italic; }      /* comments          */
-      .tag  { color: var(--tag); }       /* imports, tags       */
-      .pnt  { color: var(--orange); }    /* punctuation         */
-      .opr  { color: var(--cyan); }      /* operators           */
-      .prp  { color: var(--accent); }    /* property names      */
+  /* ── Hero ────────────────────────────── */
+  .hero {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: var(--radius);
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
 
-      /* ── Feature Grid ─────────────────────────────────── */
-      .features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, transparent 50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
 
-      .feature {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 1.2rem;
-        text-align: center;
-        transition: transform .2s, border-color .2s;
-      }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
 
-      .feature:hover {
-        transform: translateY(-3px);
-        border-color: var(--accent);
-      }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    position: relative;
+    line-height: 1.2;
+  }
 
-      .feature .emoji { font-size: 1.8rem; margin-bottom: .5rem; }
-      .feature h3     { color: var(--heading); font-size: .95rem; margin-bottom: .3rem; }
-      .feature p      { color: var(--comment); font-size: .82rem; }
+  .hero h1 .highlight {
+    color: var(--accent);
+  }
 
-      /* ── Footer ───────────────────────────────────────── */
-      footer {
-        text-align: center;
-        color: var(--comment);
-        font-size: .8rem;
-        margin-top: 3rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--border);
-      }
-
-      /* ── Responsive ───────────────────────────────────── */
-      @media (max-width: 600px) {
-        header h1 { font-size: 1.6rem; }
-        pre { font-size: .78rem; padding: 1rem; }
-      }
-    </style>
-  </head>
-  <body>
-
-  <div class="container">
-
-    <!-- ════════════ HEADER ════════════ -->
-    <header>
-      <h1>Next.js Middleware &amp; Zod Schemas</h1>
-      <p>Role-based route protection, rate limiting, and data validation — all in one view.</p>
-    </header>
-
-    <!-- ════════════ NAV PILLS ════════════ -->
-    <nav class="nav-pills">
-      <a href="#middleware">Middleware</a>
-      <a href="#login">Login Schema</a>
-      <a href="#signup">Signup Schema</a>
-      <a href="#rate-limit">Rate Limiter</a>
-    </nav>
-
-    <!-- ════════════ FEATURES ════════════ -->
-    <section class="features">
-      <div class="feature">
-        <div class="emoji">🔐</div>
-        <h3>Role-Based Access</h3>
-        <p>Admin routes protected by JWT role claims.</p>
-      </div>
-      <div class="feature">
-        <div class="emoji">📝</div>
-        <h3>Zod Validation</h3>
-        <p>Strongly-typed login &amp; signup schemas.</p>
-      </div>
-      <div class="feature">
-        <div class="emoji">⏱️</div>
-        <h3>Rate Limiting</h3>
-        <p>In-memory sliding window per IP address.</p>
-      </div>
-    </section>
-
-    <!-- ════════════ MIDLEWARE CARD ════════════ -->
-    <section class="card" id="middleware">
-      <div class="card-header">
-        <span class="icon">🛡️</span>
-        <h2>src/middleware.ts</h2>
-        <span class="badge badge-middleware">Middleware</span>
-      </div>
-      <div class="card-body">
-        <pre><code><span class="kw">import</span> { NextResponse } <span class="kw">from</span> <span class="str">'next/server'</span>
-  <span class="kw">import</span> { jwtVerify }  <span class="kw">from</span> <span class="str">'@node-rs/argon2'</span>
-
-  <span class="kw">const</span> <span class="prp">ADMIN_ROUTES</span> <span class="opr">=</span> [ <span class="str">'/admin'</span>, <span class="str">'/dashboard'</span> ]
-
-  <span class="kw">export async function</span> <span class="fn">middleware</span><span class="pnt">(</span>request<span class="pnt">)</span> <span class="pnt">{</span>
-    <span class="kw">const</span> { url }     <span class="opr">=</span> request
-    <span class="kw">const</span> { pathname } <span class="opr">=</span> <span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span>url<span class="pnt">).</span><span class="prp">pathname</span>
-
-    <span class="cmt">// ── Public routes bypass auth check ──</span>
-    <span class="kw">if</span> <span class="pnt">(</span><span class="prp">pathname</span> <span class="opr">===</span> <span class="str">'/login'</span> <span class="opr">||</span> <span class="prp">pathname</span> <span class="opr">===</span> <span
-  class="str">'/signup'</span><span class="pnt">)</span> <span class="pnt">{</span>
-      <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">next</span><span class="pnt">()</span>
-    <span class="pnt">}</span>
-
-    <span class="cmt">// ── Extract &amp; verify JWT ──</span>
-    <span class="kw">const</span> token <span class="opr">=</span> request.<span class="prp">cookies</span>.<span class="fn">get</span><span class="pnt">(</span><span class="str">'token'</span><span class="pnt">)?.</span><span class="prp">value</span>
-    <span class="kw">if</span> <span class="pnt">(!</span>token<span class="pnt">)</span> <span class="pnt">{</span>
-      <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">redirect</span><span class="pnt">(</span><span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span><span class="str">'/login'</span>, url<span class="pnt">))</span>
-    <span class="pnt">}</span>
-
-    <span class="kw">let</span> payload
-    <span class="kw">try</span> <span class="pnt">{</span>
-      payload <span class="opr">=</span> <span class="kw">await</span> <span class="fn">jwtVerify</span><span class="pnt">(</span>token, <span class="prp">process</span>.<span class="prp">env</span>.<span class="prp">JWT_SECRET</span><span class="pnt">)</span>
-    <span class="pnt">}</span> <span class="kw">catch</span> <span class="pnt">{</span>
-      <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">redirect</span><span class="pnt">(</span><span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span><span class="str">'/login'</span>, url<span class="pnt">))</span>
-    <span class="pnt">}</span>
-
-    <span class="cmt">// ── Admin route guard ──</span>
-    <span class="kw">if</span> <span class="pnt">(</span><span class="prp">ADMIN_ROUTES</span>.<span class="fn">some</span><span class="pnt">(</span>r <span class="opr">=&gt;</span> <span class="prp">pathname</span>.<span class="fn">startsWith</span><span
-  class="pnt">(</span>r<span class="pnt">))</span> <span class="pnt">)</span> <span class="pnt">{</span>
-      <span class="kw">if</span> <span class="pnt">(</span>payload.<span class="prp">role</span> <span class="opr">!==</span> <span class="str">'admin'</span><span class="pnt">)</span> <span class="pnt">{</span>
-        <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">redirect</span><span class="pnt">(</span><span class="kw">new</span> <span class="fn">URL</span><span class="pnt">(</span><span class="str">'/'</span>, url<span class="pnt">))</span>
-      <span class="pnt">}</span>
-    <span class="pnt">}</span>
-
-    <span class="kw">return</span> <span class="fn">NextResponse</span>.<span class="fn">next</span><span class="pnt">()</span>
-  <span class="pnt">}</span>
-
-  <span class="kw">export const</span> config <span class="opr">=</span> <span class="pnt">{</span>
-    matcher<span class="pnt">:</span> <span class="str">'/((?!api|_next/static|_next/image|favicon.ico).*)'</span>
-  <span class="pnt">}</span></code></pre>
-      </div>
-    </section>
-
-    <!-- ════════════ LOGIN SCHEMA ════════════ -->
-    <section class="card" id="login">
-      <div class="card-header">
-        <span class="icon">🔑</span>
-        <h2>src/schemas/login.ts</h2>
-        <span class="badge badge-validation">Zod</span>
-      </div>
-      <div class="card-body">
-        <pre><code><span class="kw">import</span> { z } <span class="
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max
