@@ -1,35 +1,865 @@
-<!--
-Design reminder — Contemporary Swiss Editorial print-house tactility:
-Deep ink-blue surfaces, ivory paper space, cyan production marks, muted gold foil accents,
-asymmetric sheet-like layouts, restrained motion, and tactile print-spec details.
-Ask on every choice: does this reinforce or dilute the premium production-studio philosophy?
--->
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <meta
-      name="description"
-      content="PrintN Design is a premium print, signage, stickers, branding, packaging, and large-format production studio with a polished quote request experience."
-    />
+    <meta name="description" content="PrintN Design is a premium print, signage, stickers, branding, packaging, and large-format production studio." />
     <meta name="theme-color" content="#071525" />
     <title>PrintN Design | Premium Print, Signage & Branding Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"
-    ></script>
-  </body>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+            background: #071525;
+            color: #f1f5f9;
+        }
+        
+        ::selection {
+            background: #fbbf24;
+            color: #0f172a;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding: 0 2rem;
+                max-width: 1280px;
+            }
+        }
+        
+        .font-display {
+            font-family: "DM Serif Display", Georgia, serif;
+            font-weight: 400;
+        }
+        
+        .gold-foil {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+        
+        .gold-foil::after {
+            content: "";
+            position: absolute;
+            inset: -60% auto -60% -50%;
+            width: 42%;
+            transform: rotate(18deg);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+            opacity: 0;
+            transition: transform 700ms ease, opacity 700ms ease;
+            z-index: -1;
+        }
+        
+        .gold-foil:hover::after {
+            opacity: 0.65;
+            transform: translateX(340%) rotate(18deg);
+        }
+        
+        .proof-card {
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+            box-shadow: 0 24px 65px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(18px);
+        }
+        
+        .proof-card::before,
+        .proof-card::after {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+            opacity: 0.75;
+        }
+        
+        .proof-card::before {
+            left: -1px;
+            top: -1px;
+            border-left: 1px solid #7dd3fc;
+            border-top: 1px solid #7dd3fc;
+        }
+        
+        .proof-card::after {
+            right: -1px;
+            bottom: -1px;
+            border-right: 1px solid #d4af37;
+            border-bottom: 1px solid #d4af37;
+        }
+        
+        .proof-row {
+            transition: transform 320ms ease, border-color 320ms ease, background 320ms ease;
+        }
+        
+        .proof-row:hover {
+            transform: translateX(8px);
+            border-color: rgba(125, 211, 252, 0.38);
+            background: rgba(125, 211, 252, 0.08);
+        }
+        
+        .quote-form label {
+            display: grid;
+            gap: 0.55rem;
+        }
+        
+        .quote-form span {
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+        
+        .quote-form input,
+        .quote-form select,
+        .quote-form textarea {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            background: rgba(2, 6, 23, 0.42);
+            color: white;
+            padding: 0.95rem 1rem;
+            outline: none;
+            transition: border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+            font-family: inherit;
+        }
+        
+        .quote-form input::placeholder,
+        .quote-form textarea::placeholder {
+            color: rgba(148, 163, 184, 0.72);
+        }
+        
+        .quote-form input:focus,
+        .quote-form select:focus,
+        .quote-form textarea:focus {
+            border-color: rgba(125, 211, 252, 0.7);
+            background: rgba(2, 6, 23, 0.58);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+        }
+        
+        .quote-form select option {
+            background: #071525;
+            color: white;
+        }
+        
+        @keyframes press-float {
+            0%, 100% {
+                transform: translateY(0) rotate(1.2deg);
+            }
+            50% {
+                transform: translateY(-12px) rotate(0.5deg);
+            }
+        }
+        
+        @keyframes kinetic-reveal {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slide-in-left {
+            from {
+                opacity: 0;
+                transform: translateX(-48px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(48px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slide-in-bottom {
+            from {
+                opacity: 0;
+                transform: translateY(48px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .animate-in {
+            animation: kinetic-reveal 800ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        
+        .fade-in {
+            animation: fade-in 600ms ease-out both;
+        }
+        
+        .slide-in-left {
+            animation: slide-in-left 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        
+        .slide-in-right {
+            animation: slide-in-right 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        
+        .slide-in-bottom {
+            animation: slide-in-bottom 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        
+        .hero-frame {
+            animation: press-float 7s ease-in-out infinite;
+        }
+        
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(7, 21, 37, 0.78);
+            backdrop-filter: blur(32px);
+            transition: all 300ms;
+        }
+        
+        header nav {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        header nav button {
+            background: none;
+            border: none;
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 300ms;
+            position: relative;
+        }
+        
+        header nav button::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: linear-gradient(to right, #fbbf24, #22d3ee);
+            transition: width 500ms ease;
+        }
+        
+        header nav button:hover {
+            color: #fbbf24;
+        }
+        
+        header nav button:hover::after {
+            width: 100%;
+        }
+        
+        main {
+            min-height: 100vh;
+        }
+        
+        section {
+            position: relative;
+        }
+        
+        button {
+            cursor: pointer;
+            transition: all 300ms ease;
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .grid { display: grid; }
+        .flex { display: flex; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-5 { gap: 1.25rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        .gap-10 { gap: 2.5rem; }
+        .gap-12 { gap: 3rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .px-7 { padding-left: 1.75rem; padding-right: 1.75rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+        .p-5 { padding: 1.25rem; }
+        .p-7 { padding: 1.75rem; }
+        .p-8 { padding: 2rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-5 { margin-top: 1.25rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-7 { margin-top: 1.75rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mt-10 { margin-top: 2.5rem; }
+        .mt-12 { margin-top: 3rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-5 { margin-bottom: 1.25rem; }
+        .mb-7 { margin-bottom: 1.75rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-5xl { font-size: 3rem; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-medium { font-weight: 500; }
+        .leading-none { line-height: 1; }
+        .leading-tight { line-height: 1.25; }
+        .leading-snug { line-height: 1.375; }
+        .leading-normal { line-height: 1.5; }
+        .leading-relaxed { line-height: 1.625; }
+        .leading-loose { line-height: 2; }
+        .tracking-tight { letter-spacing: -0.015em; }
+        .tracking-normal { letter-spacing: 0; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .uppercase { text-transform: uppercase; }
+        .inline-flex { display: inline-flex; align-items: center; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .max-w-2xl { max-width: 42rem; }
+        .max-w-3xl { max-width: 48rem; }
+        .max-w-7xl { max-width: 80rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .h-4 { height: 1rem; }
+        .h-5 { height: 1.25rem; }
+        .h-6 { height: 1.5rem; }
+        .h-11 { height: 2.75rem; }
+        .h-12 { height: 3rem; }
+        .h-14 { height: 3.5rem; }
+        .w-4 { width: 1rem; }
+        .w-5 { width: 1.25rem; }
+        .w-6 { width: 1.5rem; }
+        .w-11 { width: 2.75rem; }
+        .w-12 { width: 3rem; }
+        .w-14 { width: 3.5rem; }
+        .rounded { border-radius: 0.375rem; }
+        .rounded-full { border-radius: 9999px; }
+        .border { border: 1px solid rgba(255, 255, 255, 0.15); }
+        .bg-amber-400 { background-color: #fbbf24; }
+        .bg-amber-300 { background-color: #fcd34d; }
+        .bg-white { background-color: white; }
+        .bg-slate-50 { background-color: #f8fafc; }
+        .text-white { color: white; }
+        .text-slate-950 { color: #0f172a; }
+        .text-slate-700 { color: #334155; }
+        .text-slate-200 { color: #e2e8f0; }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-slate-400 { color: #94a3b8; }
+        .text-slate-600 { color: #475569; }
+        .text-amber-200 { color: #fde047; }
+        .text-amber-100 { color: #fef3c7; }
+        .text-cyan-100 { color: #cffafe; }
+        .text-cyan-200 { color: #a5f3fc; }
+        .text-sky-700 { color: #0369a1; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-75 { opacity: 0.75; }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .hidden { display: none; }
+        .block { display: block; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .sticky { position: sticky; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .z-10 { z-index: 10; }
+        .z-50 { z-index: 50; }
+        .overflow-hidden { overflow: hidden; }
+        .pointer-events-none { pointer-events: none; }
+        .min-h-screen { min-height: 100vh; }
+        .min-h-96 { min-height: 24rem; }
+        .aspect-video { aspect-ratio: 16 / 9; }
+        
+        @media (max-width: 768px) {
+            header nav {
+                display: none;
+            }
+            .hidden-mobile {
+                display: none;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .hidden-desktop {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="fixed inset-0 -z-10" style="background: linear-gradient(135deg, #06101f 0%, #0b1b2f 42%, #071525 100%);"></div>
+    <div id="cursorGlow" class="pointer-events-none fixed z-50 h-80 w-80 rounded-full blur-3xl transition-opacity duration-300" style="background: linear-gradient(to right, rgba(34, 211, 238, 0.2), rgba(245, 158, 11, 0.1)); opacity: 0.4; display: none;"></div>
+    
+    <header>
+        <div class="container flex items-center justify-between py-4">
+            <button onclick="scrollToId('top')" class="group flex items-center gap-3 text-left transition-transform duration-300 hover:scale-105">
+                <span class="relative grid h-11 w-11 place-items-center border border-amber-300/40 bg-white/[0.04] shadow-lg transition-all duration-300 hover:shadow-2xl hover:border-amber-300/70">
+                    <span class="absolute -left-1 -top-1 h-3 w-3 border-l border-t border-cyan-300 transition-all duration-300"></span>
+                    <span class="absolute -bottom-1 -right-1 h-3 w-3 border-b border-r border-amber-300 transition-all duration-300"></span>
+                    <span class="font-display text-xl text-amber-200 transition-transform duration-300">P</span>
+                </span>
+                <span>
+                    <span class="block font-display text-2xl leading-none tracking-tight text-white transition-colors duration-300">PrintN</span>
+                    <span class="block text-xs uppercase tracking-widest text-cyan-200/80 transition-colors duration-300">Design Studio</span>
+                </span>
+            </button>
+            
+            <nav class="hidden-mobile flex items-center gap-8">
+                <button onclick="scrollToId('services')" class="group relative text-sm font-medium text-slate-200/80 transition-colors duration-300">Services</button>
+                <button onclick="scrollToId('process')" class="group relative text-sm font-medium text-slate-200/80 transition-colors duration-300">Process</button>
+                <button onclick="scrollToId('proofs')" class="group relative text-sm font-medium text-slate-200/80 transition-colors duration-300">Proofs</button>
+                <button onclick="scrollToId('quote')" class="group relative text-sm font-medium text-slate-200/80 transition-colors duration-300">Quote</button>
+            </nav>
+            
+            <div class="hidden-mobile flex items-center gap-3">
+                <a href="https://wa.me/971500000000" class="group inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition-all duration-300">
+                    💬 WhatsApp
+                </a>
+                <button onclick="scrollToId('quote')" class="gold-foil inline-flex items-center gap-2 bg-amber-400 px-5 py-2.5 text-sm font-bold text-slate-950 transition-all duration-300">
+                    Request quote →
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <main id="top">
+        <section class="relative mx-auto grid max-w-7xl gap-12 px-5 pb-24 pt-20 sm:px-8 lg:grid-cols-2 lg:items-center lg:pb-32 lg:pt-28">
+            <div class="relative z-10 animate-in fade-in slide-in-left">
+                <div class="mb-7 inline-flex items-center gap-3 border border-cyan-200/25 bg-cyan-200/[0.06] px-4 py-2 text-xs font-semibold uppercase tracking-widest text-cyan-100 transition-all duration-500">
+                    <span class="h-1.5 w-1.5 rounded-full bg-amber-300" style="box-shadow: 0 0 18px rgba(245, 158, 11, 0.8); animation: pulse 2s infinite;"></span>
+                    Premium print, signage & brand production
+                </div>
+                <h1 class="font-display text-6xl leading-tight tracking-tight text-white transition-all duration-700">
+                    Design that survives the press.
+                </h1>
+                <p class="mt-8 max-w-2xl text-lg leading-8 text-slate-200/78 transition-colors duration-500">
+                    PrintN Design builds tactile brand moments across signage, stickers, packaging, branding kits, vehicle graphics, and large-format campaigns — with quote clarity from the first proof.
+                </p>
+                <div class="mt-10 flex flex-col gap-4 sm:flex-row">
+                    <button onclick="scrollToId('quote')" class="gold-foil inline-flex items-center justify-center gap-3 bg-amber-400 px-7 py-4 text-sm font-extrabold uppercase tracking-wide text-slate-950 transition-all duration-300">
+                        Start a print quote →
+                    </button>
+                    <button onclick="scrollToId('services')" class="group inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.035] px-7 py-4 text-sm font-bold uppercase tracking-wide text-white transition-all duration-300">
+                        Explore services →
+                    </button>
+                </div>
+                <div class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div class="proof-card px-4 py-5 transition-all duration-500 hover:scale-105">
+                        <div class="font-display text-3xl text-amber-100">48h</div>
+                        <div class="mt-2 text-xs leading-5 text-slate-300/75">typical quote turnaround</div>
+                    </div>
+                    <div class="proof-card px-4 py-5 transition-all duration-500 hover:scale-105">
+                        <div class="font-display text-3xl text-amber-100">6</div>
+                        <div class="mt-2 text-xs leading-5 text-slate-300/75">core production categories</div>
+                    </div>
+                    <div class="proof-card px-4 py-5 transition-all duration-500 hover:scale-105">
+                        <div class="font-display text-3xl text-amber-100">CMYK+</div>
+                        <div class="mt-2 text-xs leading-5 text-slate-300/75">colour-managed workflow</div>
+                    </div>
+                    <div class="proof-card px-4 py-5 transition-all duration-500 hover:scale-105">
+                        <div class="font-display text-3xl text-amber-100">AED</div>
+                        <div class="mt-2 text-xs leading-5 text-slate-300/75">budget-aware options</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative min-h-96 lg:min-h-screen animate-in fade-in slide-in-right">
+                <div class="absolute -right-24 top-6 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl transition-all duration-500"></div>
+                <div class="hero-frame group absolute inset-x-0 top-0 mx-auto max-w-3xl border border-white/12 bg-white/[0.04] p-3 shadow-2xl transition-all duration-700">
+                    <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663645778344/PfuCU4tFMDWtz7V7ov3v7E/printn-hero-print-sheets-CDdgbFFocLGhiJutcG5VYp.webp" alt="Premium print proofs" class="aspect-video w-full object-cover transition-all duration-700" />
+                    <div class="absolute left-7 top-7 border border-white/15 bg-blue-950/78 px-4 py-3 backdrop-blur-xl transition-all duration-500">
+                        <span class="block text-xs uppercase tracking-wider text-cyan-100">Live proof board</span>
+                        <span class="mt-1 block font-display text-2xl text-white">CMYK + Foil</span>
+                    </div>
+                    <div class="absolute -bottom-7 right-10 border border-amber-200/35 bg-blue-900/95 px-5 py-4 shadow-2xl transition-all duration-500">
+                        <span class="text-xs uppercase tracking-wider text-amber-200">Finish sample</span>
+                        <div class="mt-2 flex items-center gap-2 text-sm font-semibold text-white">
+                            ✨ Gold foil / matte stock
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="services" class="relative border-y border-white/10 bg-slate-50 py-24 text-slate-950 sm:py-32">
+            <div class="absolute inset-0 opacity-30" style="background-image: linear-gradient(rgba(2, 132, 199, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(2, 132, 199, 0.08) 1px, transparent 1px); background-size: 42px 42px;"></div>
+            <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
+                <div class="grid gap-8 lg:grid-cols-2 lg:items-end">
+                    <div class="animate-in fade-in slide-in-left">
+                        <p class="section-label text-sky-700">Service catalogue</p>
+                        <h2 class="mt-5 font-display text-5xl leading-tight tracking-tight text-slate-950">
+                            A studio wall of production-ready options.
+                        </h2>
+                    </div>
+                    <p class="max-w-2xl text-lg leading-8 text-slate-600 animate-in fade-in slide-in-right">
+                        Choose a single item or combine a campaign system. Every quote can account for dimensions, quantity, stock, finishing, deadline pressure, and delivery coordination.
+                    </p>
+                </div>
+                
+                <div class="mt-16 grid gap-7 lg:grid-cols-3">
+                    <div class="group relative overflow-hidden border border-slate-200 bg-white shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 animate-in fade-in slide-in-bottom">
+                        <div class="relative overflow-hidden">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663645778344/PfuCU4tFMDWtz7V7ov3v7E/printn-signage-showcase-TZmdDbLBmfB28BzTGW5w3g.webp" alt="Signage" class="aspect-video w-full object-cover transition-all duration-700" />
+                            <div class="absolute left-4 top-4 border border-white/40 bg-blue-950/75 px-3 py-2 text-xs font-bold uppercase tracking-wider text-cyan-100 backdrop-blur transition-all duration-500">
+                                01 / Signage
+                            </div>
+                        </div>
+                        <div class="p-7">
+                            <div class="mb-5 grid h-12 w-12 place-items-center border border-amber-300/45 bg-amber-100 text-slate-950 transition-all duration-500">
+                                📐
+                            </div>
+                            <h3 class="font-display text-3xl leading-none tracking-tight text-slate-950">Architectural signs that hold the room.</h3>
+                            <p class="mt-5 text-sm leading-7 text-slate-600">Dimensional letters, acrylic panels, storefront fascia, wayfinding systems, and large-format brand statements planned from substrate to installation.</p>
+                            <div class="mt-7 flex flex-wrap gap-2">
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Acrylic</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Aluminium composite</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">LED-ready</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Outdoor grade</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="group relative overflow-hidden border border-slate-200 bg-white shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 animate-in fade-in slide-in-bottom lg:mt-8">
+                        <div class="relative overflow-hidden">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663645778344/PfuCU4tFMDWtz7V7ov3v7E/printn-stickers-packaging-HHmpiiL69PnpBcJ8DZdfmc.webp" alt="Stickers" class="aspect-video w-full object-cover transition-all duration-700" />
+                            <div class="absolute left-4 top-4 border border-white/40 bg-blue-950/75 px-3 py-2 text-xs font-bold uppercase tracking-wider text-cyan-100 backdrop-blur transition-all duration-500">
+                                02 / Stickers & Labels
+                            </div>
+                        </div>
+                        <div class="p-7">
+                            <div class="mb-5 grid h-12 w-12 place-items-center border border-amber-300/45 bg-amber-100 text-slate-950 transition-all duration-500">
+                                ✂️
+                            </div>
+                            <h3 class="font-display text-3xl leading-none tracking-tight text-slate-950">Die-cut detail for packaging, campaigns, and retail.</h3>
+                            <p class="mt-5 text-sm leading-7 text-slate-600">Short-run and production label systems with finish guidance, contour cutting, lamination options, and clean repeatable colour output.</p>
+                            <div class="mt-7 flex flex-wrap gap-2">
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Vinyl</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Paper labels</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Kiss-cut</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Matte / gloss</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="group relative overflow-hidden border border-slate-200 bg-white shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 animate-in fade-in slide-in-bottom lg:mt-4">
+                        <div class="relative overflow-hidden">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663645778344/PfuCU4tFMDWtz7V7ov3v7E/printn-branding-kit-BvkLFkGxoRhjWtos4dcBcU.webp" alt="Branding" class="aspect-video w-full object-cover transition-all duration-700" />
+                            <div class="absolute left-4 top-4 border border-white/40 bg-blue-950/75 px-3 py-2 text-xs font-bold uppercase tracking-wider text-cyan-100 backdrop-blur transition-all duration-500">
+                                03 / Branding Systems
+                            </div>
+                        </div>
+                        <div class="p-7">
+                            <div class="mb-5 grid h-12 w-12 place-items-center border border-amber-300/45 bg-amber-100 text-slate-950 transition-all duration-500">
+                                🎨
+                            </div>
+                            <h3 class="font-display text-3xl leading-none tracking-tight text-slate-950">Print-ready identity kits with tactile authority.</h3>
+                            <p class="mt-5 text-sm leading-7 text-slate-600">Business cards, stationery, launch packs, packaging sleeves, presentation folders, and campaign assets coordinated under one production language.</p>
+                            <div class="mt-7 flex flex-wrap gap-2">
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Foil</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Emboss</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Spot UV</span>
+                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-300">Premium stocks</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="process" class="relative py-24 sm:py-32">
+            <div class="mx-auto max-w-7xl px-5 sm:px-8">
+                <div class="grid gap-12 lg:grid-cols-2 lg:items-start">
+                    <div class="sticky top-28 animate-in fade-in slide-in-left">
+                        <p class="section-label text-amber-200">Production sequence</p>
+                        <h2 class="mt-5 font-display text-5xl leading-tight tracking-tight text-white">
+                            From rough idea to finished surface.
+                        </h2>
+                        <p class="mt-7 max-w-xl text-lg leading-8 text-slate-300/78">
+                            The process is designed to reduce ambiguity: define the job, inspect artwork, select materials, proof details, produce cleanly, and hand over with delivery clarity.
+                        </p>
+                    </div>
+                    <div class="grid gap-4">
+                        <div class="proof-row group grid gap-4 border border-white/10 bg-white/[0.035] p-5 backdrop-blur transition-all duration-500 md:grid-cols-3 md:items-center animate-in fade-in slide-in-right">
+                            <span class="font-display text-5xl text-amber-100/90">01</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Brief & material advice</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-300/70">Submit project type, dimensions, quantity, budget range, and deadline signals.</p>
+                            </div>
+                            <span class="text-cyan-200">✓</span>
+                        </div>
+                        <div class="proof-row group grid gap-4 border border-white/10 bg-white/[0.035] p-5 backdrop-blur transition-all duration-500 md:grid-cols-3 md:items-center animate-in fade-in slide-in-right" style="animation-delay: 100ms;">
+                            <span class="font-display text-5xl text-amber-100/90">02</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Artwork inspection</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-300/70">Artwork is checked for scale, bleed, resolution, colour, and production constraints.</p>
+                            </div>
+                            <span class="text-cyan-200">✓</span>
+                        </div>
+                        <div class="proof-row group grid gap-4 border border-white/10 bg-white/[0.035] p-5 backdrop-blur transition-all duration-500 md:grid-cols-3 md:items-center animate-in fade-in slide-in-right" style="animation-delay: 200ms;">
+                            <span class="font-display text-5xl text-amber-100/90">03</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Proofing & calibration</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-300/70">A practical proof aligns finish, substrate, colour expectations, and installation needs.</p>
+                            </div>
+                            <span class="text-cyan-200">✓</span>
+                        </div>
+                        <div class="proof-row group grid gap-4 border border-white/10 bg-white/[0.035] p-5 backdrop-blur transition-all duration-500 md:grid-cols-3 md:items-center animate-in fade-in slide-in-right" style="animation-delay: 300ms;">
+                            <span class="font-display text-5xl text-amber-100/90">04</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Production & finishing</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-300/70">Work moves through print, cut, laminate, mount, foil, emboss, or finishing as needed.</p>
+                            </div>
+                            <span class="text-cyan-200">✓</span>
+                        </div>
+                        <div class="proof-row group grid gap-4 border border-white/10 bg-white/[0.035] p-5 backdrop-blur transition-all duration-500 md:grid-cols-3 md:items-center animate-in fade-in slide-in-right" style="animation-delay: 400ms;">
+                            <span class="font-display text-5xl text-amber-100/90">05</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Delivery coordination</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-300/70">Packed jobs are coordinated for pickup, courier, or installation scheduling.</p>
+                            </div>
+                            <span class="text-cyan-200">✓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="proofs" class="bg-slate-50 py-24 text-slate-950 sm:py-32">
+            <div class="mx-auto max-w-7xl px-5 sm:px-8">
+                <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+                    <div class="relative border border-slate-200 bg-white p-4 shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-in fade-in slide-in-left">
+                        <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663645778344/PfuCU4tFMDWtz7V7ov3v7E/printn-branding-kit-BvkLFkGxoRhjWtos4dcBcU.webp" alt="Premium branding" class="aspect-video w-full object-cover transition-transform duration-700" />
+                        <div class="absolute -bottom-7 left-7 max-w-xs border border-slate-200 bg-white px-5 py-4 shadow-xl transition-all duration-500">
+                            <span class="text-xs font-bold uppercase tracking-wider text-sky-700">QC card</span>
+                            <p class="mt-2 text-sm leading-6 text-slate-600">Colour checks, finishing details, and material notes are tracked before approval.</p>
+                        </div>
+                    </div>
+                    <div class="pt-12 lg:pt-0 animate-in fade-in slide-in-right">
+                        <p class="section-label text-sky-700">Quality controls</p>
+                        <h2 class="mt-5 font-display text-5xl leading-tight tracking-tight text-slate-950">
+                            The small details are the brand.
+                        </h2>
+                        <div class="mt-8 grid gap-4">
+                            <div class="flex gap-4 border border-slate-200 bg-slate-50 p-5 transition-all duration-500 hover:border-sky-300 hover:bg-sky-50 hover:shadow-lg hover:scale-105">
+                                <div class="grid h-11 w-11 flex-none place-items-center bg-slate-950 text-amber-200">📦</div>
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-slate-950">Material-fit guidance</h3>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">Select stock and substrate according to indoor/outdoor use, finish, quantity, and campaign lifespan.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 border border-slate-200 bg-slate-50 p-5 transition-all duration-500 hover:border-sky-300 hover:bg-sky-50 hover:shadow-lg hover:scale-105">
+                                <div class="grid h-11 w-11 flex-none place-items-center bg-slate-950 text-amber-200">⏰</div>
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-slate-950">Deadline-aware quoting</h3>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">Rush needs, install windows, and launch dates can be surfaced in the quote request from the beginning.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 border border-slate-200 bg-slate-50 p-5 transition-all duration-500 hover:border-sky-300 hover:bg-sky-50 hover:shadow-lg hover:scale-105">
+                                <div class="grid h-11 w-11 flex-none place-items-center bg-slate-950 text-amber-200">✨</div>
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-slate-950">Finish planning</h3>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">Matte, gloss, foil, emboss, lamination, and spot effects are considered as part of the overall system.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-24 sm:py-32">
+            <div class="mx-auto max-w-7xl px-5 sm:px-8">
+                <div class="grid gap-5 lg:grid-cols-3">
+                    <blockquote class="proof-card p-7 transition-all duration-500 hover:shadow-lg hover:scale-105 hover:-translate-y-2 animate-in fade-in slide-in-bottom">
+                        <div class="mb-7 flex gap-1 text-amber-200">⭐⭐⭐⭐⭐</div>
+                        <p class="text-lg leading-8 text-slate-100/88">"PrintN Design translated our rough launch idea into signage, labels, and counter cards that looked consistent from day one."</p>
+                        <footer class="mt-7 text-sm font-bold uppercase tracking-wider text-cyan-100/85">Retail launch team</footer>
+                    </blockquote>
+                    <blockquote class="proof-card p-7 transition-all duration-500 hover:shadow-lg hover:scale-105 hover:-translate-y-2 animate-in fade-in slide-in-bottom lg:-mt-8" style="animation-delay: 150ms;">
+                        <div class="mb-7 flex gap-1 text-amber-200">⭐⭐⭐⭐⭐</div>
+                        <p class="text-lg leading-8 text-slate-100/88">"The material advice helped us avoid over-spending. The final stickers and window graphics felt premium without slowing the campaign."</p>
+                        <footer class="mt-7 text-sm font-bold uppercase tracking-wider text-cyan-100/85">Food brand founder</footer>
+                    </blockquote>
+                    <blockquote class="proof-card p-7 transition-all duration-500 hover:shadow-lg hover:scale-105 hover:-translate-y-2 animate-in fade-in slide-in-bottom lg:-mt-4" style="animation-delay: 300ms;">
+                        <div class="mb-7 flex gap-1 text-amber-200">⭐⭐⭐⭐⭐</div>
+                        <p class="text-lg leading-8 text-slate-100/88">"They treated every printed piece as part of the brand system, not as separate jobs. That made approvals much easier."</p>
+                        <footer class="mt-7 text-sm font-bold uppercase tracking-wider text-cyan-100/85">Corporate marketing lead</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+        
+        <section id="quote" class="relative border-t border-white/10 bg-blue-950 py-24 sm:py-32">
+            <div class="absolute inset-0 bg-gradient-to-br from-amber-900/15 via-transparent to-cyan-900/15"></div>
+            <div class="relative mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-2 lg:items-start">
+                <div class="animate-in fade-in slide-in-left">
+                    <p class="section-label text-amber-200">Quote request</p>
+                    <h2 class="mt-5 font-display text-5xl leading-tight tracking-tight text-white">
+                        Bring the brief. We'll map the print path.
+                    </h2>
+                    <p class="mt-7 max-w-xl text-lg leading-8 text-slate-300/78">
+                        This form is designed as a polished frontend quote flow. In production, it can be connected to email, CRM, or a backend workflow when needed.
+                    </p>
+                    <div class="mt-10 grid gap-4 text-sm text-slate-200/80">
+                        <a class="group flex items-center gap-3 transition-all duration-300 hover:text-cyan-200" href="tel:+971500000000">
+                            📞 +971 50 000 0000
+                        </a>
+                        <a class="group flex items-center gap-3 transition-all duration-300 hover:text-cyan-200" href="mailto:hello@printndesign.example">
+                            ✉️ hello@printndesign.example
+                        </a>
+                        <span class="group flex items-center gap-3 transition-all duration-300">
+                            📍 Dubai & UAE-wide project coordination
+                        </span>
+                    </div>
+                </div>
+                
+                <form onsubmit="handleQuoteSubmit(event)" class="quote-form border border-white/12 bg-white/[0.06] p-5 shadow-2xl backdrop-blur-xl transition-all duration-500 animate-in fade-in slide-in-right sm:p-8">
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <label class="group transition-all duration-300">
+                            <span>Name</span>
+                            <input required minlength="2" name="name" placeholder="Your name" />
+                        </label>
+                        <label class="group transition-all duration-300">
+                            <span>Email</span>
+                            <input required type="email" name="email" placeholder="you@company.com" />
+                        </label>
+                        <label class="group transition-all duration-300">
+                            <span>Phone</span>
+                            <input name="phone" placeholder="+971 ..." />
+                        </label>
+                        <label class="group transition-all duration-300">
+                            <span>Service type</span>
+                            <select name="service" defaultvalue="signage">
+                                <option value="signage">Signage</option>
+                                <option value="stickers">Stickers & labels</option>
+                                <option value="branding">Branding kit</option>
+                                <option value="packaging">Packaging</option>
+                                <option value="vehicle-wraps">Vehicle wraps</option>
+                                <option value="large-format">Large format</option>
+                            </select>
+                        </label>
+                        <label class="group transition-all duration-300">
+                            <span>Approx. quantity</span>
+                            <input type="number" min="1" max="10000" name="quantity" placeholder="250" />
+                        </label>
+                        <label class="group transition-all duration-300">
+                            <span>Deadline</span>
+                            <input type="date" name="deadline" />
+                        </label>
+                        <label class="group transition-all duration-300 sm:col-span-2">
+                            <span>Project notes</span>
+                            <textarea required minlength="10" name="notes" rows="5" placeholder="Tell us dimensions, material ideas, artwork status, installation needs, and budget range."></textarea>
+                        </label>
+                    </div>
+                    <button type="submit" class="gold-foil mt-6 inline-flex w-full items-center justify-center gap-3 bg-amber-400 px-7 py-4 text-sm font-extrabold uppercase tracking-wide text-slate-950 transition-all duration-300">
+                        Prepare my quote brief →
+                    </button>
+                    <div id="successMessage" class="mt-5 hidden animate-in slide-in-bottom border border-cyan-200/30 bg-cyan-200/[0.08] px-4 py-3 text-sm font-semibold text-cyan-50 transition-all duration-500">
+                        ✓ Your quote brief has been prepared. Connect this form to a backend to submit live enquiries.
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="border-t border-white/10 bg-blue-950 px-5 py-10 sm:px-8 transition-colors duration-500">
+        <div class="mx-auto flex max-w-7xl flex-col gap-6 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
+            <p class="transition-colors duration-300">© 2026 PrintN Design. Premium print, signage, stickers, branding, packaging, and large-format production.</p>
+            <div class="flex flex-wrap gap-5">
+                <button onclick="scrollToId('services')" class="transition-all duration-300 hover:text-amber-200">Services</button>
+                <button onclick="scrollToId('process')" class="transition-all duration-300 hover:text-amber-200">Process</button>
+                <button onclick="scrollToId('quote')" class="transition-all duration-300 hover:text-amber-200">Quote</button>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        function scrollToId(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        const cursorGlow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', (e) => {
+            cursorGlow.style.display = 'block';
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+            cursorGlow.style.transform = 'translate(-50%, -50%)';
+        });
+        
+        function handleQuoteSubmit(event) {
+            event.preventDefault();
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.remove('hidden');
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 4500);
+        }
+    </script>
+</body>
 </html>
