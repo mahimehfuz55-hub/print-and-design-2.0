@@ -1,327 +1,35 @@
-/*
+<!--
 Design reminder — Contemporary Swiss Editorial print-house tactility:
 Deep ink-blue surfaces, ivory paper space, cyan production marks, muted gold foil accents,
 asymmetric sheet-like layouts, restrained motion, and tactile print-spec details.
 Ask on every choice: does this reinforce or dilute the premium production-studio philosophy?
-*/
-@import "tailwindcss";
-@import "tw-animate-css";
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta
+      name="description"
+      content="PrintN Design is a premium print, signage, stickers, branding, packaging, and large-format production studio with a polished quote request experience."
+    />
+    <meta name="theme-color" content="#071525" />
+    <title>PrintN Design | Premium Print, Signage & Branding Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
-:root {
-  --primary: oklch(0.49 0.16 245);
-  --primary-foreground: oklch(0.98 0.01 245);
-  --sidebar-primary: oklch(0.56 0.18 245);
-  --sidebar-primary-foreground: oklch(0.98 0.01 245);
-  --chart-1: oklch(0.7 0.13 241);
-  --chart-2: oklch(0.6 0.16 250);
-  --chart-3: oklch(0.54 0.19 260);
-  --chart-4: oklch(0.76 0.14 84);
-  --chart-5: oklch(0.64 0.12 74);
-  --radius: 0rem;
-  --background: oklch(0.18 0.035 248);
-  --foreground: oklch(0.97 0.012 94);
-  --card: oklch(0.22 0.04 248);
-  --card-foreground: oklch(0.97 0.012 94);
-  --popover: oklch(0.2 0.035 248);
-  --popover-foreground: oklch(0.97 0.012 94);
-  --secondary: oklch(0.28 0.045 248);
-  --secondary-foreground: oklch(0.94 0.012 94);
-  --muted: oklch(0.28 0.035 248);
-  --muted-foreground: oklch(0.73 0.025 248);
-  --accent: oklch(0.78 0.145 78);
-  --accent-foreground: oklch(0.17 0.035 248);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 13%);
-  --input: oklch(1 0 0 / 13%);
-  --ring: oklch(0.68 0.12 236);
-  --sidebar: oklch(0.16 0.035 248);
-  --sidebar-foreground: oklch(0.96 0.012 94);
-  --sidebar-accent: oklch(0.26 0.04 248);
-  --sidebar-accent-foreground: oklch(0.96 0.012 94);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.68 0.12 236);
-}
-
-.dark {
-  --background: oklch(0.14 0.035 248);
-  --foreground: oklch(0.97 0.012 94);
-  --card: oklch(0.19 0.04 248);
-  --card-foreground: oklch(0.97 0.012 94);
-  --popover: oklch(0.19 0.04 248);
-  --popover-foreground: oklch(0.97 0.012 94);
-  --secondary: oklch(0.25 0.04 248);
-  --secondary-foreground: oklch(0.95 0.012 94);
-  --muted: oklch(0.26 0.035 248);
-  --muted-foreground: oklch(0.7 0.025 248);
-  --accent: oklch(0.78 0.145 78);
-  --accent-foreground: oklch(0.17 0.035 248);
-  --border: oklch(1 0 0 / 13%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.68 0.12 236);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  }
-
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  a[href],
-  select:not(:disabled),
-  input[type="checkbox"]:not(:disabled),
-  input[type="radio"]:not(:disabled) {
-    @apply cursor-pointer;
-  }
-}
-
-@layer components {
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
-  .font-display {
-    font-family: "DM Serif Display", Georgia, serif;
-    font-weight: 400;
-  }
-
-  .paper-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 280 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.34'/%3E%3C/svg%3E");
-    mix-blend-mode: soft-light;
-  }
-
-  .section-label {
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-  }
-
-  .gold-foil {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-
-  .gold-foil::after {
-    content: "";
-    position: absolute;
-    inset: -60% auto -60% -50%;
-    width: 42%;
-    transform: rotate(18deg);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-    opacity: 0;
-    transition: transform 700ms ease, opacity 700ms ease;
-    z-index: -1;
-  }
-
-  .gold-foil:hover::after {
-    opacity: 0.65;
-    transform: translateX(340%) rotate(18deg);
-  }
-
-  .proof-card {
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
-    box-shadow: 0 24px 65px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(18px);
-  }
-
-  .proof-card::before,
-  .proof-card::after,
-  .hero-frame::before,
-  .hero-frame::after,
-  .service-card::before,
-  .service-card::after {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    pointer-events: none;
-    opacity: 0.75;
-  }
-
-  .proof-card::before,
-  .hero-frame::before,
-  .service-card::before {
-    left: -1px;
-    top: -1px;
-    border-left: 1px solid #7dd3fc;
-    border-top: 1px solid #7dd3fc;
-  }
-
-  .proof-card::after,
-  .hero-frame::after,
-  .service-card::after {
-    right: -1px;
-    bottom: -1px;
-    border-right: 1px solid #d4af37;
-    border-bottom: 1px solid #d4af37;
-  }
-
-  .proof-row {
-    transition: transform 320ms ease, border-color 320ms ease, background 320ms ease;
-  }
-
-  .proof-row:hover {
-    transform: translateX(8px);
-    border-color: rgba(125, 211, 252, 0.38);
-    background: rgba(125, 211, 252, 0.08);
-  }
-
-  .quote-form label {
-    display: grid;
-    gap: 0.55rem;
-  }
-
-  .quote-form span {
-    color: rgba(226, 232, 240, 0.8);
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .quote-form input,
-  .quote-form select,
-  .quote-form textarea {
-    width: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    background: rgba(2, 6, 23, 0.42);
-    color: white;
-    padding: 0.95rem 1rem;
-    outline: none;
-    transition: border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
-  }
-
-  .quote-form input::placeholder,
-  .quote-form textarea::placeholder {
-    color: rgba(148, 163, 184, 0.72);
-  }
-
-  .quote-form input:focus,
-  .quote-form select:focus,
-  .quote-form textarea:focus {
-    border-color: rgba(125, 211, 252, 0.7);
-    background: rgba(2, 6, 23, 0.58);
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
-  }
-
-  .quote-form select option {
-    background: #071525;
-    color: white;
-  }
-
-  @media (min-width: 640px) {
-    .container {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .container {
-      padding-left: 2rem;
-      padding-right: 2rem;
-      max-width: 1280px;
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-frame {
-      animation: press-float 7s ease-in-out infinite;
-    }
-
-    .service-card,
-    .proof-card,
-    .proof-row {
-      animation: reveal-up 720ms both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 28%;
-    }
-  }
-}
-
-@keyframes press-float {
-  0%, 100% {
-    transform: translateY(0) rotate(1.2deg);
-  }
-  50% {
-    transform: translateY(-12px) rotate(0.5deg);
-  }
-}
-
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script
+      defer
+      src="%VITE_ANALYTICS_ENDPOINT%/umami"
+      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"
+    ></script>
+  </body>
+</html>
